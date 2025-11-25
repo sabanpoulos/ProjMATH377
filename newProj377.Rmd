@@ -1,0 +1,73 @@
+---
+title: "NewProj377"
+author: "Saban Contandriopoulos"
+date: "2025-11-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(car)
+library(dplyr)
+library(ggplot2)
+
+data <-read.csv("/Users/saban/Desktop/archive/KenPom_Barttorvik.csv")
+
+#head(data)
+#summary(data)
+
+selected_data <-data[,c("WIN.", "EFG.", "EFG.D", "FTR", "FTRD", "TOV.", "TOV.D", "OREB.", "DREB.", "OP.OREB.", "X2PT.", "X2PT.D", "X3PT.", "X3PT.D", "BLK.", "BLKED.", "AST.", "OP.AST.", "X2PTR", "X3PTR", "X2PTRD", "X3PTRD", "FT.", "OP.FT.") ]
+
+cor_matrix<- cor(selected_data)
+
+win_cors <-data.frame(Metric =rownames(cor_matrix), Correlation = cor_matrix[, "WIN."])
+
+win_cors<- win_cors[win_cors$Metric !="WIN.",]
+
+win_cors$Abs_Correlation <-abs(win_cors$Correlation )
+win_cors_sorted <-win_cors[order(-win_cors$Abs_Correlation), ]
+
+print(win_cors_sorted)
+
+
+model0 <-lm(WIN. ~ EFG.+ X2PT. + EFG.D + X2PT.D + X3PT. +X3PT.D + TOV.+DREB. + OP.OREB. + BLKED., data= selected_data)
+summary(model0)
+
+model1 <-lm(WIN. ~ EFG.+ X2PT. + EFG.D + X2PT.D + X3PT. +X3PT.D + TOV.+DREB. + BLKED., data= selected_data)
+summary(model1)
+
+model2 <- lm(WIN. ~ EFG. + X2PT. + EFG.D + X2PT.D +X3PT. + TOV.+DREB. + BLKED., data= selected_data)
+summary(model2)
+
+model3 <- lm(WIN. ~ EFG. + X2PT. + EFG.D +X3PT. + TOV.+DREB. + BLKED., data= selected_data)
+summary(model3)
+
+model4 <- lm(WIN. ~ X2PT. + EFG.D +X3PT. + TOV.+DREB. + BLKED., data= selected_data)
+summary(model4)
+
+model5 <- lm(WIN. ~ X2PT. + EFG.D +X3PT. + TOV.+DREB., data= selected_data)
+summary(model5)
+
+summary(model5)
+summary(model1)
+
+vif(model5)
+vif(model1)
+
+AIC(model5)
+BIC(model5)
+AIC(model1)
+BIC(model1)
+
+par(mfrow= c(2, 2))
+plot(model5, , which = 1:4)
+
+#After running through multiple models, Model 5 was selected as the most reliable option. We used plots to confirm that the residuals are randomly scattered, normally distributed, and homoscedastic, with no influential outliers (max Cook’s distance is about 0.02). The model’s lower AIC and BIC, high Adjusted R-squared (0.4463), minimal multicollinearity (VIF < 5), and statistically significant predictors (p < 0.001) validate that it is appropriate.
+```
+
+
+
+
